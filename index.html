@@ -4,225 +4,348 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Домены команды</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
 :root{
-  --bg:#f6f6f5; --surface:#fff; --sunken:#efefed;
-  --line:rgba(28,28,30,.09); --line-strong:rgba(28,28,30,.16);
-  --text:#1c1c1e; --text-2:#55565b; --muted:#8a8b90;
-  --accent:#2b4c7e; --accent-ink:#24426e; --on-accent:#fff; --accent-soft:rgba(43,76,126,.08);
-  --danger:#b3402f; --danger-soft:rgba(179,64,47,.07);
-  --warn:#9a6a0f; --warn-soft:rgba(196,140,20,.10);
-  --ok:#3d7a4f;
-  --r-ctl:8px; --r-card:12px;
-  --ease:cubic-bezier(.2,.7,.2,1);
-  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
-  --sans:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --bg:#fafafa; --surface:#fff; --raised:#f4f4f5;
+  --line:rgba(23,23,23,.08); --line-2:rgba(23,23,23,.15);
+  --text:#171717; --text-2:#525252; --muted:#737373;
+  --accent:#1d4ed8; --accent-soft:rgba(29,78,216,.08);
+  --btn:#171717; --on-btn:#fff;
+  --danger:#c62828; --warn:#b45309; --ok:#15803d;
+  --shadow:0 1px 2px rgba(0,0,0,.04);
+  --float:0 8px 24px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --ease:cubic-bezier(.22,1,.36,1);
+  color-scheme:light;
+  --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23737373' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#161618; --surface:#1e1e21; --sunken:#19191b;
-  --line:rgba(240,240,242,.08); --line-strong:rgba(240,240,242,.15);
-  --text:#ececee; --text-2:#a9aaaf; --muted:#7b7c82;
-  --accent:#8fb0e0; --accent-ink:#9dbbe6; --on-accent:#111; --accent-soft:rgba(143,176,224,.10);
-  --danger:#e08470; --danger-soft:rgba(224,132,112,.08);
-  --warn:#e0b45a; --warn-soft:rgba(224,180,90,.09); --ok:#7fbf8f;
+  --bg:#141415; --surface:#19191b; --raised:#232325;
+  --line:rgba(237,237,237,.08); --line-2:rgba(237,237,237,.14);
+  --text:#ededed; --text-2:#a1a1a6; --muted:#85858b;
+  --accent:#8ab0ff; --accent-soft:rgba(138,176,255,.10);
+  --btn:#ededed; --on-btn:#141415;
+  --danger:#ef6b6b; --warn:#e9b44c; --ok:#4cc38a;
+  --shadow:none; --float:0 8px 24px rgba(0,0,0,.4); color-scheme:dark;
 }}
+:root[data-theme="dark"]{
+  --bg:#141415; --surface:#19191b; --raised:#232325;
+  --line:rgba(237,237,237,.08); --line-2:rgba(237,237,237,.14);
+  --text:#ededed; --text-2:#a1a1a6; --muted:#85858b;
+  --accent:#8ab0ff; --accent-soft:rgba(138,176,255,.10);
+  --btn:#ededed; --on-btn:#141415;
+  --danger:#ef6b6b; --warn:#e9b44c; --ok:#4cc38a;
+  --shadow:none; --float:0 8px 24px rgba(0,0,0,.4); color-scheme:dark;
+}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 var(--sans);-webkit-font-smoothing:antialiased}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/20px -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font:inherit;color:inherit}
-.num,.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:tabular-nums}
 svg.i{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
-
-.wrap{max-width:1440px;margin:0 auto;padding:24px 32px 64px}
-header{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:24px}
-header h1{font-size:20px;font-weight:500;margin:0}
-header .today{color:var(--muted);font-size:13px}
-header .sp{flex:1}
-.btn{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--line-strong);background:var(--surface);cursor:pointer;transition:background-color .15s var(--ease),border-color .15s var(--ease),transform .1s var(--ease);white-space:nowrap}
-.btn:hover{background:var(--sunken)}
-.btn:active{transform:scale(.98)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
-.btn.primary:hover{background:var(--accent-ink)}
-.btn.ghost{border-color:transparent;background:transparent;color:var(--text-2)}
-.btn.ghost:hover{background:var(--sunken)}
-.btn.icon{width:32px;height:32px;padding:0;justify-content:center}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-/* сводка */
-.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(0,2fr);gap:12px;margin-bottom:12px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:16px 20px}
-.card .label{color:var(--text-2);font-size:13px}
-.card .fig{font:500 24px/1.2 var(--mono);font-variant-numeric:tabular-nums;margin-top:8px}
-.card .sub{color:var(--muted);font-size:12px;margin-top:4px}
-.card.danger .fig{color:var(--danger)}
-.card.warn .fig{color:var(--warn)}
-.card.click{cursor:pointer;transition:border-color .15s var(--ease)}
-.card.click:hover{border-color:var(--line-strong)}
-.statuses{display:flex;flex-direction:column;gap:4px}
-.st-row{display:grid;grid-template-columns:88px 1fr 28px;align-items:center;gap:12px;padding:4px 8px;margin:0 -8px;border-radius:6px;cursor:pointer;background:none;border:0;text-align:left}
-.st-row:hover,.st-row.on{background:var(--sunken)}
-.st-row .bar{height:6px;border-radius:3px;background:var(--sunken);overflow:hidden}
-.st-row .bar i{display:block;height:100%;background:var(--text-2);border-radius:3px}
-.st-row .n{text-align:right;font:500 13px var(--mono)}
+.wrap{max-width:1440px;margin:0 auto;padding:0 32px 64px}
 
-/* график продлений */
-.chart{margin-bottom:24px}
-.chart-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:16px}
-.chart-head h2{font-size:15px;font-weight:500;margin:0}
-.chart-head .legend{display:flex;gap:16px;color:var(--muted);font-size:12px}
-.chart-head .legend span{display:inline-flex;align-items:center;gap:6px}
-.chart-head .legend i{width:8px;height:8px;border-radius:2px;display:inline-block}
-.bars{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:8px;align-items:end;height:148px;border-bottom:1px solid var(--line)}
-.bar-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;cursor:pointer;background:none;border:0;padding:0}
-.bar-col .v{font:500 11px var(--mono);color:var(--text-2)}
-.bar-col .b{width:100%;max-width:44px;border-radius:4px 4px 0 0;background:var(--line-strong);transition:background-color .15s var(--ease)}
+/* шапка */
+.top{display:flex;align-items:center;gap:12px;height:72px}
+.top h1{font-size:20px;line-height:28px;font-weight:600;margin:0;white-space:nowrap}
+.top .meta{color:var(--muted);font-size:13px;margin-left:4px}
+.top .sp{flex:1}
+
+/* кнопки и поля */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface);color:var(--text);cursor:pointer;white-space:nowrap;transition:background-color .15s var(--ease),border-color .15s var(--ease),transform .12s var(--ease)}
+.btn:hover{background:var(--raised)}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--btn);border-color:var(--btn);color:var(--on-btn)}
+.btn.primary:hover{opacity:.88;background:var(--btn)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--text-2)}
+.btn.ghost:hover{background:var(--raised);color:var(--text)}
+.btn.icon{width:32px;height:32px;padding:0;color:var(--muted);border-color:transparent;background:transparent}
+.btn.icon:hover{background:var(--raised)}
+.btn.icon:hover{color:var(--text)}
+.btn .i{color:var(--muted)}
+.btn.primary .i{color:inherit}
+.field-base,input[type=text],input[type=date],input[type=number],textarea,select{height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface);transition:border-color .15s var(--ease)}
+input:hover,select:hover,textarea:hover{border-color:var(--muted)}
+select{appearance:none;-webkit-appearance:none;padding-right:32px;background:var(--surface) var(--chev) no-repeat right 10px center;cursor:pointer}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+
+/* обзор */
+.overview{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:16px;margin-bottom:16px}
+.pay{padding:20px 24px 16px;display:flex;flex-direction:column}
+.chart{flex:1;display:flex;flex-direction:column}
+.pay-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px}
+.label{color:var(--text-2);font-size:13px}
+.fig{font-size:32px;line-height:36px;font-weight:500;margin-top:4px;font-variant-numeric:tabular-nums}
+.fig small{font-size:16px;color:var(--muted);font-weight:400;margin-left:4px}
+.sub{color:var(--muted);font-size:13px;margin-top:4px}
+.legend{display:flex;gap:16px;color:var(--muted);font-size:12px;padding-top:4px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:8px;height:8px;border-radius:2px;display:inline-block}
+.bars{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:8px;align-items:end;flex:1;min-height:172px;border-bottom:1px solid var(--line)}
+.bar-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px;cursor:pointer;background:none;border:0;padding:0;border-radius:6px 6px 0 0}
+.bar-col .v{font-size:11px;line-height:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar-col .b{width:100%;max-width:40px;border-radius:4px 4px 0 0;background:var(--line-2);transition:background-color .15s var(--ease)}
 .bar-col:hover .b{background:var(--muted)}
 .bar-col.soon .b{background:var(--warn)}
 .bar-col.over .b{background:var(--danger)}
-.bar-col.on .b{outline:2px solid var(--accent);outline-offset:1px}
+.bar-col.on .v{color:var(--text);font-weight:500}
+.bar-col.on .b{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
 .months{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:8px;margin-top:8px}
-.months div{text-align:center;font:400 11px var(--mono);color:var(--muted)}
-.months div b{display:block;font-weight:400;color:var(--text-2)}
+.months div{text-align:center;font-size:12px;line-height:16px;color:var(--text-2)}
+.months div span{display:block;color:var(--muted);font-size:11px}
 
-/* панель фильтров */
-.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-.search{position:relative;flex:1 1 240px;max-width:360px}
-.search svg{position:absolute;left:10px;top:10px;color:var(--muted)}
-.search input[type=search]{width:100%;height:36px;border-radius:var(--r-ctl);border:1px solid var(--line-strong);background:var(--surface);padding:0 12px 0 34px}
-input[type=text],input[type=date],input[type=number],select,textarea{height:36px;padding:0 10px;border-radius:var(--r-ctl);border:1px solid var(--line-strong);background:var(--surface);transition:border-color .15s var(--ease)}
-input:hover,select:hover,textarea:hover{border-color:var(--muted)}
-select{padding-right:28px}
-.chip{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--line-strong);background:var(--surface);cursor:pointer;user-select:none;color:var(--text-2)}
-.chip input{margin:0;accent-color:var(--accent)}
-.chip.on{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
-.count{color:var(--muted);font-size:13px;margin-left:auto}
+.side{display:flex;flex-direction:column;gap:16px}
+.side .card{padding:12px}
+.side h2{font-size:13px;font-weight:500;color:var(--text-2);margin:4px 8px 8px}
+.row-btn{display:grid;grid-template-columns:16px 1fr auto;align-items:center;gap:8px;width:100%;height:36px;padding:0 8px;border:0;border-radius:8px;background:none;text-align:left;cursor:pointer;transition:background-color .15s var(--ease)}
+.row-btn:hover{background:var(--raised)}
+.row-btn.on{background:var(--accent-soft)}
+.row-btn .n{font-weight:500;font-variant-numeric:tabular-nums}
+.row-btn .x{color:var(--muted);font-weight:400;margin-left:8px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;justify-self:center}
+.st{grid-template-columns:16px 88px 1fr 28px}
+.st .track{height:4px;border-radius:2px;background:var(--raised);overflow:hidden}
+.st .track i{display:block;height:100%;background:var(--muted);border-radius:2px}
+.st .n{text-align:right}
 
-/* таблица */
-.table-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:880px}
-th{font-weight:500;font-size:12px;color:var(--text-2);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--surface)}
+/* список */
+.list{overflow:hidden}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px;border-bottom:1px solid var(--line)}
+.search{position:relative;flex:1 1 220px;max-width:320px}
+.search .i{position:absolute;left:10px;top:10px;color:var(--muted)}
+.search input{width:100%;padding:0 36px 0 34px;height:36px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface)}
+.kbd{position:absolute;right:8px;top:8px;height:20px;min-width:20px;padding:0 4px;border-radius:4px;border:1px solid var(--line-2);border-bottom-width:2px;font-size:11px;line-height:16px;text-align:center;color:var(--muted);background:var(--raised)}
+.search input:focus + .kbd{display:none}
+.chip{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface);cursor:pointer;user-select:none;color:var(--text-2);transition:background-color .15s var(--ease),border-color .15s var(--ease)}
+.chip:hover{background:var(--raised)}
+.chip input{position:absolute;opacity:0;pointer-events:none}
+.chip .dot{justify-self:auto}
+.chip:has(input:checked){border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
+.chip:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.count{margin-left:auto;color:var(--muted);font-size:13px;white-space:nowrap}
+.count b{color:var(--text);font-weight:500}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:920px}
+th{font-weight:500;font-size:12px;line-height:16px;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;user-select:none}
+th button{all:unset;cursor:pointer;display:inline-flex;gap:4px;align-items:center}
+th button:hover{color:var(--text)}
+th button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+th.on button{color:var(--text)}
 th.r,td.r{text-align:right}
-th .arr{color:var(--accent);margin-left:4px}
-td{padding:0 12px;height:44px;border-bottom:1px solid var(--line);white-space:nowrap}
-tr:last-child td{border-bottom:0}
+th.r button{flex-direction:row-reverse}
+th:first-child,td:first-child{padding-left:20px}
+td{padding:8px 12px;height:56px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
 tbody tr{transition:background-color .12s var(--ease)}
-tbody tr:hover{background:var(--sunken)}
-tr.over{background:var(--danger-soft)}
-tr.soon{background:var(--warn-soft)}
-.dom{font-family:var(--mono);font-size:13px}
-.flag{display:inline-flex;vertical-align:-3px;margin-left:6px;color:var(--warn);cursor:help}
-.days{display:inline-block;min-width:92px;margin-left:8px;font:400 12px var(--mono);color:var(--muted)}
-tr.soon .days{color:var(--warn)}
+tbody tr:hover{background:var(--raised)}
+.l1{display:block}
+.l2{display:block;font-size:12px;line-height:16px;color:var(--muted);margin-top:2px}
+.l2.warn{color:var(--warn);max-width:340px;overflow:hidden;text-overflow:ellipsis}
+tr.over td:first-child{box-shadow:inset 3px 0 0 var(--danger)}
+tr.soon td:first-child{box-shadow:inset 3px 0 0 var(--warn)}
 tr.over .days{color:var(--danger)}
+tr.soon .days{color:var(--warn)}
 .none{color:var(--muted)}
-td select.status{height:30px;font-size:13px;border-color:transparent;background:transparent;padding:0 24px 0 8px;margin-left:-8px}
-td select.status:hover{border-color:var(--line-strong);background:var(--surface)}
-.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:2px;vertical-align:1px}
-.acts{display:flex;gap:4px;justify-content:flex-end}
-.acts .btn{color:var(--muted)}
-.acts .btn:hover{color:var(--text)}
+.status-wrap{display:inline-flex;align-items:center;position:relative}
+.status-wrap .dot{position:absolute;left:4px;pointer-events:none}
+td select.status{height:32px;padding:0 28px 0 24px;border-color:transparent;background-color:transparent;margin-left:-8px}
+td select.status:hover,td select.status:focus{border-color:var(--line-2);background-color:var(--surface)}
+.acts{display:flex;gap:2px;justify-content:flex-end;opacity:0;transition:opacity .15s var(--ease)}
+tr:hover .acts,tr:focus-within .acts{opacity:1}
+@media (hover:none){.acts{opacity:1}}
+.empty-row td{height:96px;text-align:center;color:var(--muted)}
 
-.empty{padding:64px 24px;text-align:center;color:var(--text-2)}
-.empty h2{font-size:17px;font-weight:500;color:var(--text);margin:0 0 8px}
-.empty p{margin:0 auto 20px;max-width:440px}
-.empty .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.drop{outline:2px dashed var(--accent);outline-offset:-8px}
+.foot{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:12px;color:var(--muted);font-size:12px}
+.foot .warn{color:var(--warn)}
+.link{all:unset;cursor:pointer;color:var(--text-2);text-decoration:underline;text-underline-offset:2px;text-decoration-color:var(--line-2)}
+.link:hover{color:var(--text)}
+.link:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+
+/* меню выгрузки */
+.menu-wrap{position:relative}
+.menu{position:absolute;right:0;top:calc(100% + 4px);z-index:20;min-width:264px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--float);opacity:0;transform:translateY(-4px);pointer-events:none;transition:opacity .16s var(--ease),transform .16s var(--ease)}
+.menu.open{opacity:1;transform:none;pointer-events:auto}
+.menu button{all:unset;box-sizing:border-box;display:flex;flex-direction:column;width:100%;padding:8px 10px;border-radius:6px;cursor:pointer}
+.menu button:hover,.menu button:focus-visible{background:var(--raised)}
+.menu button span{font-size:12px;color:var(--muted)}
+
+/* стартовый экран */
+.start{min-height:calc(100vh - 136px);display:grid;place-items:center;padding:0 0 72px}
+.drop{width:100%;max-width:640px;padding:48px 32px;border:1.5px dashed var(--line-2);border-radius:16px;text-align:center;transition:border-color .15s var(--ease),background-color .15s var(--ease)}
+body.dragging .drop{border-color:var(--accent);background:var(--accent-soft)}
+.sheet{width:132px;margin:0 auto 24px;border:1px solid var(--line-2);border-radius:8px;overflow:hidden;background:var(--surface);box-shadow:var(--float);transform:rotate(-2deg)}
+.sheet div{display:grid;grid-template-columns:2fr 1fr 1fr;border-top:1px solid var(--line)}
+.sheet div:first-child{border-top:0;background:var(--raised)}
+.sheet i{height:14px;border-left:1px solid var(--line);position:relative}
+.sheet i:first-child{border-left:0}
+.sheet i::after{content:"";position:absolute;left:5px;right:30%;top:6px;height:2px;border-radius:1px;background:var(--line-2)}
+.sheet div:nth-child(3) i:nth-child(2)::after{background:var(--danger);right:20%}
+.sheet div:nth-child(5) i:nth-child(2)::after{background:var(--warn);right:40%}
+.start h2{font-size:22px;line-height:28px;font-weight:500;margin:0 0 8px}
+.start p{color:var(--text-2);margin:0 auto 24px;max-width:440px}
+.start .acts2{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.cols{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:24px}
+.cols span{font-size:12px;line-height:16px;padding:4px 8px;border-radius:6px;background:var(--raised);color:var(--text-2)}
+.hint{margin-top:16px;color:var(--muted);font-size:12px}
 
 /* диалоги */
-dialog{border:1px solid var(--line);border-radius:16px;padding:0;background:var(--surface);color:var(--text);width:min(520px,calc(100vw - 32px));box-shadow:0 12px 40px rgba(0,0,0,.18)}
-dialog::backdrop{background:rgba(20,20,22,.35)}
-dialog form,dialog .body{padding:24px}
-dialog h2{font-size:17px;font-weight:500;margin:0 0 16px}
+dialog{border:1px solid var(--line);border-radius:16px;padding:0;background:var(--surface);color:var(--text);width:min(520px,calc(100vw - 32px));box-shadow:var(--float)}
+dialog::backdrop{background:rgba(10,10,12,.32)}
+dialog[open]{animation:rise .3s var(--ease)}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+.dlg{padding:24px}
+dialog h2{font-size:18px;line-height:24px;font-weight:500;margin:0 0 20px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
 .field{display:flex;flex-direction:column;gap:6px}
 .field.full{grid-column:1/-1}
 .field label{font-size:13px;color:var(--text-2)}
 .field input,.field select,.field textarea{width:100%}
-.field textarea{height:72px;padding:8px 10px;resize:vertical}
-.err{color:var(--danger);font-size:12px;min-height:16px}
-.dlg-acts{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+.field textarea{height:72px;padding:8px 12px;resize:vertical}
+.err{color:var(--danger);font-size:12px;line-height:16px}
+.err:empty{display:none}
+.checks{grid-column:1/-1;display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.checks a{color:var(--text-2);text-underline-offset:2px;text-decoration-color:var(--line-2)}
+.dlg-acts{display:flex;justify-content:flex-end;gap:8px;margin-top:24px}
 #report{width:min(720px,calc(100vw - 32px))}
-#report .body{max-height:76vh;overflow:auto}
-.rep-list{margin:0;padding:0;list-style:none}
-.rep-list li{display:grid;grid-template-columns:40px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
-.rep-list li:last-child{border-bottom:0}
-.rep-list .n{font:500 15px var(--mono);text-align:right}
-.rep-list .t{color:var(--text)}
-.rep-list .ex{color:var(--muted);font-size:12px;font-family:var(--mono);margin-top:2px;white-space:normal}
-h3{font-size:14px;font-weight:500;margin:20px 0 4px}
+#report .dlg{max-height:80vh;overflow:auto}
+.rep-lead{margin:-12px 0 4px;color:var(--text-2)}
+.rep h3{font-size:13px;font-weight:500;color:var(--text-2);margin:24px 0 4px}
+.rep ul{margin:0;padding:0;list-style:none}
+.rep li{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.rep li:last-child{border-bottom:0}
+.rep .n{font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
+.rep .ex{color:var(--muted);font-size:12px;line-height:18px;margin-top:2px}
+.rep .note{color:var(--muted);font-size:12px;margin:0}
 
-.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,8px);opacity:0;background:var(--text);color:var(--bg);padding:10px 16px;border-radius:10px;display:flex;gap:16px;align-items:center;transition:opacity .2s var(--ease),transform .2s var(--ease);pointer-events:none;z-index:10}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,8px);opacity:0;background:var(--btn);color:var(--on-btn);padding:10px 16px;border-radius:10px;display:flex;gap:16px;align-items:center;box-shadow:var(--float);transition:opacity .2s var(--ease),transform .2s var(--ease);pointer-events:none;z-index:30;max-width:calc(100vw - 32px)}
 .toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-.toast button{background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer;padding:0}
-.foot{margin-top:16px;color:var(--muted);font-size:12px;display:flex;gap:16px;flex-wrap:wrap}
+.toast button{all:unset;cursor:pointer;font-weight:500;text-decoration:underline;text-underline-offset:2px}
 
-@media (max-width:1100px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.summary .wide{grid-column:1/-1}}
-@media (max-width:640px){
-  .wrap{padding:16px 16px 48px}
-  .bars,.months{gap:3px}.bar-col .v{display:none}
-  .months div{font-size:10px}
+@media (max-width:1100px){.overview{grid-template-columns:minmax(0,1fr)}.side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){
+  .wrap{padding:0 16px 48px}
+  .top{height:auto;padding:16px 0;flex-wrap:wrap}
+  .top .sp{flex-basis:100%;height:0}
+  .top .meta{flex-basis:100%;margin:0}
+  .side{grid-template-columns:minmax(0,1fr)}
+  .pay{padding:16px}
+  .pay-head{flex-direction:column}
+  .chart{overflow-x:auto;margin:0 -16px;padding:0 16px;flex:none}
+  .bars{flex:none;height:172px}
+  .menu{left:0;right:auto;width:100%;min-width:0}
+  .kbd{display:none}
+  .search input{padding-right:12px}
+  td:nth-child(6){align-self:start;margin-top:-6px}
+  .bars,.months{min-width:600px}
+  .top>.btn,.top>.menu-wrap{flex:1 1 40%}
+  .menu-wrap .btn{width:100%}
+  table{min-width:0}
+  thead{display:none}
+  tbody tr{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+  tbody tr:last-child{border-bottom:0}
+  td,td:first-child{display:block;height:auto;padding:0;border:0!important;white-space:normal}
+  tr.over{box-shadow:inset 3px 0 0 var(--danger)}
+  tr.soon{box-shadow:inset 3px 0 0 var(--warn)}
+  tr.over td:first-child,tr.soon td:first-child{box-shadow:none}
+  td:nth-child(1){grid-area:1/1}
+  td:nth-child(6){grid-area:1/2;justify-self:end}
+  td:nth-child(3){grid-area:2/1}
+  td:nth-child(4){grid-area:2/2;align-self:start}
+  td:nth-child(4):not(:has(.none))::after{content:" $"}
+  td:nth-child(2){grid-area:3/1;color:var(--text-2);font-size:13px}
+  td:nth-child(5){grid-area:3/2;color:var(--text-2);font-size:13px;text-align:right}
+  td:nth-child(7){grid-area:4/1/5/3}
+  .acts{justify-content:flex-start;margin-left:-8px}
+  td select.status{margin-left:0;padding-left:20px}
+  .status-wrap .dot{left:6px}
+  .empty-row td{grid-column:1/-1;height:auto;padding:24px 0}
+  .l2.warn{max-width:none;white-space:normal}
   .grid2{grid-template-columns:1fr}
-  .search{max-width:none}
-  .count{margin-left:0}
+  .search{max-width:none;flex-basis:100%}
+  .toolbar select{flex:1 1 140px}
+  .count{margin-left:0;flex-basis:100%}
+  .drop{padding:32px 16px}
 }
 </style>
 </head>
 <body>
-<div class="wrap" id="app">
-  <header>
+<div class="wrap">
+  <header class="top">
     <h1>Домены команды</h1>
-    <span class="today" id="today"></span>
+    <span class="meta" id="meta"></span>
     <span class="sp"></span>
     <button class="btn ghost" id="btnReport" hidden>Отчёт об импорте</button>
-    <button class="btn" id="btnImport"><svg class="i" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>Загрузить Excel</button>
-    <button class="btn" id="btnExport"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>Выгрузить</button>
+    <button class="btn" id="btnImport"><svg class="i" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>Загрузить</button>
+    <div class="menu-wrap" id="exportWrap">
+      <button class="btn" id="btnExport" aria-haspopup="menu" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>Выгрузить<svg class="i" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="menu" id="exportMenu" role="menu">
+        <button role="menuitem" data-x="xlsx">Excel (.xlsx)<span>Даты и суммы остаются числами</span></button>
+        <button role="menuitem" data-x="csv">CSV<span>Для русского Excel, разделитель «;»</span></button>
+      </div>
+    </div>
     <button class="btn primary" id="btnAdd"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Добавить домен</button>
     <input type="file" id="file" accept=".xlsx,.xls,.csv" hidden>
   </header>
 
-  <section id="main" hidden>
-    <div class="summary" id="summary"></div>
-    <div class="card chart">
-      <div class="chart-head">
-        <h2>Продления по месяцам, $</h2>
-        <div class="legend"><span><i style="background:var(--danger)"></i>уже истекли</span><span><i style="background:var(--warn)"></i>ближайшие 30 дней</span></div>
+  <main id="main" hidden>
+    <section class="overview">
+      <div class="card pay">
+        <div class="pay-head">
+          <div>
+            <div class="label">Продление всей базы за год</div>
+            <div class="fig" id="figTotal"></div>
+            <div class="sub" id="figSub"></div>
+          </div>
+          <div class="legend"><span><i class="sw" style="background:var(--danger)"></i>Истекли</span><span><i class="sw" style="background:var(--warn)"></i>Ближайшие 30 дней</span></div>
+        </div>
+        <div class="chart"><div class="bars" id="bars"></div><div class="months" id="months"></div></div>
       </div>
-      <div class="bars" id="bars"></div>
-      <div class="months" id="months"></div>
-    </div>
+      <div class="side">
+        <div class="card"><h2>Требует внимания</h2><div id="attention"></div></div>
+        <div class="card"><h2>Статусы</h2><div id="statuses"></div></div>
+      </div>
+    </section>
 
-    <div class="toolbar">
-      <label class="search"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="q" placeholder="Поиск" aria-label="Поиск по домену, сотруднику, заметке"></label>
-      <select id="fStatus" aria-label="Статус"></select>
-      <select id="fOwner" aria-label="Сотрудник"></select>
-      <select id="fReg" aria-label="Регистратор"></select>
-      <label class="chip" id="cSoon"><input type="checkbox" id="fSoon">Истекают и истекли</label>
-      <label class="chip" id="cFlag"><input type="checkbox" id="fFlag">Требуют проверки</label>
-      <button class="btn ghost" id="btnReset" hidden>Сбросить</button>
-      <span class="count" id="count"></span>
-    </div>
-    <div class="table-wrap"><table>
-      <thead><tr id="thead"></tr></thead>
-      <tbody id="tbody"></tbody>
-    </table></div>
-    <div class="foot"><span id="saved"></span><button class="btn ghost" id="btnWipe" style="height:24px;padding:0 6px;font-size:12px">Очистить базу</button></div>
-  </section>
+    <section class="card list">
+      <div class="toolbar">
+        <label class="search"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="q" placeholder="Поиск" aria-label="Поиск по домену, сотруднику, заметке"><span class="kbd" aria-hidden="true">/</span></label>
+        <select id="fStatus" aria-label="Статус"></select>
+        <select id="fOwner" aria-label="Сотрудник"></select>
+        <select id="fReg" aria-label="Регистратор"></select>
+        <label class="chip"><input type="checkbox" id="fSoon">Истекают и истекли</label>
+        <label class="chip"><input type="checkbox" id="fFlag">Требуют проверки</label>
+        <button class="btn ghost" id="btnReset" hidden>Сбросить</button>
+        <span class="count" id="count"></span>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr id="thead"></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table></div>
+    </section>
+    <div class="foot"><span id="saved"></span><span id="backup"></span><span class="sp" style="flex:1"></span><button class="link" id="btnWipe">Очистить базу</button></div>
+  </main>
 
-  <section id="empty" class="card empty" hidden>
-    <h2>База доменов пуста</h2>
-    <p>Загрузите выгрузку в Excel или CSV: колонки «Домен», «Регистратор», «Дата окончания», «Продление, $», «Сотрудник», «Статус». При загрузке приложение само поправит формат и покажет, что изменило.</p>
-    <div class="row">
-      <button class="btn primary" id="btnImport2">Выбрать файл</button>
-      <button class="btn" id="btnSample">Открыть тестовую выгрузку</button>
+  <section id="empty" class="start" hidden>
+    <div class="drop">
+      <div class="sheet" aria-hidden="true"><div><i></i><i></i><i></i></div><div><i></i><i></i><i></i></div><div><i></i><i></i><i></i></div><div><i></i><i></i><i></i></div><div><i></i><i></i><i></i></div><div><i></i><i></i><i></i></div></div>
+      <h2>Загрузите выгрузку доменов</h2>
+      <p>Ваша выгрузка уже встроена в страницу. Можно загрузить и другой Excel или CSV с такими же колонками: формат дат, цен и статусов приложение поправит само, а спорные строки покажет отдельно</p>
+      <div class="acts2">
+        <button class="btn primary" id="btnSample">Открыть Список_доменов.xlsx</button>
+        <button class="btn" id="btnImport2">Выбрать другой файл</button>
+      </div>
+      <div class="cols"><span>Домен</span><span>Регистратор</span><span>Дата окончания</span><span>Продление, $</span><span>Сотрудник</span><span>Статус</span></div>
+      <div class="hint">Файл можно перетащить в окно</div>
     </div>
-    <p style="margin-top:16px;font-size:12px;color:var(--muted)">Файл можно просто перетащить в окно</p>
   </section>
 </div>
 
-<dialog id="edit"><form method="dialog" id="editForm" novalidate>
+<dialog id="edit"><form method="dialog" id="editForm" class="dlg" novalidate>
   <h2 id="editTitle">Новый домен</h2>
   <div class="grid2">
     <div class="field full"><label for="eDomain">Домен</label><input type="text" id="eDomain" placeholder="example.com" autocomplete="off" spellcheck="false"><div class="err" id="eDomainErr"></div></div>
@@ -232,25 +355,31 @@ h3{font-size:14px;font-weight:500;margin:20px 0 4px}
     <div class="field"><label for="eOwner">Сотрудник</label><input type="text" id="eOwner" list="ownerList" autocomplete="off" placeholder="не назначен"></div>
     <div class="field full"><label for="eStatus">Статус</label><select id="eStatus"></select></div>
     <div class="field full"><label for="eNote">Заметка</label><textarea id="eNote"></textarea></div>
+    <div class="checks" id="eChecks"></div>
   </div>
   <datalist id="regList"></datalist><datalist id="ownerList"></datalist>
   <div class="dlg-acts"><button class="btn ghost" value="cancel" formnovalidate>Отмена</button><button class="btn primary" id="eSave" value="save">Сохранить</button></div>
 </form></dialog>
 
-<dialog id="report"><div class="body">
+<dialog id="report"><div class="dlg rep">
   <h2>Что поправлено при загрузке</h2>
   <div id="repBody"></div>
   <div class="dlg-acts"><button class="btn primary" onclick="this.closest('dialog').close()">Понятно</button></div>
 </div></dialog>
 
-<div class="toast" id="toast"><span id="toastText"></span><button id="toastUndo" hidden>Вернуть</button></div>
+<dialog id="ask"><form method="dialog" class="dlg">
+  <h2 id="askTitle"></h2><p id="askText" style="margin:-8px 0 0;color:var(--text-2)"></p>
+  <div class="dlg-acts"><button class="btn ghost" value="no">Отмена</button><button class="btn primary" value="yes" id="askOk"></button></div>
+</form></dialog>
+
+<div class="toast" id="toast" role="status"><span id="toastText"></span><button id="toastUndo" hidden>Вернуть</button></div>
 
 <script>
 "use strict";
 const SAMPLE_B64 = "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";
 const KEY = "domains-crm-v1";
 const STATUSES = ["Активен", "В работе", "На паузе", "Свободен", "Забанен"];
-const ST_COLOR = {"Активен": "var(--ok)", "В работе": "var(--accent)", "На паузе": "var(--muted)", "Свободен": "var(--text-2)", "Забанен": "var(--danger)"};
+const ST_COLOR = {"Активен": "var(--ok)", "В работе": "var(--accent)", "На паузе": "var(--muted)", "Свободен": "transparent;box-shadow:inset 0 0 0 1.5px var(--muted)", "Забанен": "var(--danger)"};
 const STATUS_ALIASES = {
   "активен": "Активен", "активный": "Активен", "активна": "Активен", "active": "Активен",
   "в работе": "В работе", "в работу": "В работе", "in progress": "В работе",
@@ -263,9 +392,10 @@ const SOON_DAYS = 30;
 const NONE = "__none__"; // значение фильтра «не назначен»
 const $ = id => document.getElementById(id);
 const MONTHS = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+const MONTHS_GEN = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
 
 let db = [];          // [{id, domain, registrar, expires:'YYYY-MM-DD'|'', price:number|null, owner, status, note, review}]
-let lastReport = null;
+let lastReport = null, lastExport = null;
 let sort = {key: "expires", dir: 1};
 let monthFilter = null; // 'over' | 'YYYY-MM'
 let storageOk = true;
@@ -277,6 +407,7 @@ const utc = iso => { const [y, m, d] = iso.split("-").map(Number); return Date.U
 const daysLeft = iso => iso ? Math.round((utc(iso) - utc(todayISO())) / 864e5) : null;
 const fmtDate = iso => iso ? iso.split("-").reverse().join(".") : "";
 const validISO = (y, m, d) => { const t = new Date(Date.UTC(y, m - 1, d)); return t.getUTCFullYear() === y && t.getUTCMonth() === m - 1 && t.getUTCDate() === d ? `${y}-${pad(m)}-${pad(d)}` : ""; };
+function addYear(iso) { const [y, m, d] = iso.split("-").map(Number); return validISO(y + 1, m, d) || validISO(y + 1, m, d - 1); }
 function plural(n, one, few, many) { const a = Math.abs(n) % 100, b = a % 10; return a > 10 && a < 20 ? many : b === 1 ? one : b >= 2 && b <= 4 ? few : many; }
 function daysText(n) {
   if (n === null) return "";
@@ -287,12 +418,11 @@ function daysText(n) {
 
 /* ---------- хранение ---------- */
 function save() {
-  try { localStorage.setItem(KEY, JSON.stringify({db, lastReport})); storageOk = true; }
+  try { localStorage.setItem(KEY, JSON.stringify({db, lastReport, lastExport})); storageOk = true; }
   catch (e) { storageOk = false; }
-  $("saved").textContent = storageOk ? `Сохранено в этом браузере, ${db.length} ${plural(db.length, "домен", "домена", "доменов")}` : "Браузер не даёт сохранять данные: перед закрытием выгрузите базу в Excel";
 }
 function load() {
-  try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && Array.isArray(s.db)) { db = s.db; lastReport = s.lastReport || null; } }
+  try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && Array.isArray(s.db)) { db = s.db; lastReport = s.lastReport || null; lastExport = s.lastExport || null; } }
   catch (e) { storageOk = false; }
 }
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
@@ -310,14 +440,14 @@ function parseDate(v) { // → [iso, был ли исправлен формат
   if (v instanceof Date) return [validISO(v.getFullYear(), v.getMonth() + 1, v.getDate()), false];
   const s = String(v).trim(); let m;
   if ((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return [validISO(+m[1], +m[2], +m[3]), true];
-  if ((m = s.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2}|\d{4})$/))) { const y = m[3].length === 2 ? 2000 + +m[3] : +m[3]; return [validISO(y, +m[2], +m[1]), true]; }
+  if ((m = s.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2}|\d{4})$/))) { const y = m[3].length === 2 ? 2000 + +m[3] : +m[3]; return [validISO(y, +m[2], +m[1]), !/^\d{2}\.\d{2}\.\d{4}$/.test(s)]; }
   return ["", true];
 }
 function parsePrice(v) { // → [number|null, был ли исправлен формат]
   if (v === null || v === undefined || String(v).trim() === "") return [null, false];
   if (typeof v === "number") return [v, false];
-  const m = String(v).replace(",", ".").match(/\d+(\.\d+)?/);
-  return [m ? +m[0] : null, true];
+  const s = String(v).replace(/\s/g, "").replace(",", "."), m = s.match(/-?\d+(\.\d+)?/);
+  return [m ? +m[0] : null, !/^-?\d+(\.\d+)?$/.test(s)];
 }
 function normRegistrar(v) {
   const s = String(v ?? "").trim();
@@ -338,7 +468,7 @@ function importRows(rows) {
     expires: findCol(header, "дата", "окончан", "expir"), price: findCol(header, "продлен", "цена", "стоимость", "price", "renew"),
     owner: findCol(header, "сотрудник", "ответствен", "owner", "employee"), status: findCol(header, "статус", "status"), note: findCol(header, "заметк", "note", "коммент"),
   };
-  if (col.domain < 0) throw new Error("В файле нет колонки «Домен»");
+  if (col.domain < 0) throw new Error("в файле нет колонки «Домен»");
   const fix = {status: [], price: [], date: [], domain: [], owner: [], reg: []};
   const issues = {noDate: [], badDate: [], noPrice: [], zeroPrice: [], oddPrice: [], badDomain: [], conflict: [], unknownStatus: []};
   const dropped = [];
@@ -362,15 +492,16 @@ function importRows(rows) {
     if (!owner) fix.owner.push(`${domain}: «${rawOwner ?? "пусто"}» → не назначен`);
     const rawStatus = String(get(col.status) ?? "").trim();
     let status = STATUS_ALIASES[rawStatus.toLowerCase()];
-    if (status && rawStatus !== status.toLowerCase()) fix.status.push(`«${rawStatus}» → ${status}`);
-    const rec = {id: uid(), domain, registrar, expires, price, owner, status: status || "В работе", note: String(get(col.note) ?? "").trim(), review: ""};
-    const why = [];
+    if (status && rawStatus !== status && rawStatus !== status.toLowerCase()) fix.status.push(`«${rawStatus}» → ${status}`);
+    const noteLines = String(get(col.note) ?? "").split(/\n| \| /).map(l => l.trim()).filter(Boolean);
+    const rec = {id: uid(), domain, registrar, expires, price, owner, status: status || "В работе", note: noteLines.filter(l => !l.startsWith("Проверить: ")).join("\n"), review: ""};
+    const why = noteLines.filter(l => l.startsWith("Проверить: ")).map(l => l.slice(11));
     if (!status) { why.push(`статус «${rawStatus}» не распознан, поставлен «В работе»`); issues.unknownStatus.push(domain); }
     if (!DOMAIN_RE.test(domain)) { why.push("некорректное имя домена"); issues.badDomain.push(`строка ${line}: «${rawDomain}»`); }
-    if (!expires) { why.push(get(col.expires) == null || String(get(col.expires)).trim() === "" ? "в файле нет даты окончания" : `дата «${get(col.expires)}» не распознана`); (get(col.expires) == null ? issues.noDate : issues.badDate).push(domain); }
+    if (!expires) { const raw = get(col.expires); const empty = raw == null || String(raw).trim() === ""; why.push(empty ? "в файле нет даты окончания" : `дата «${raw}» не распознана`); (empty ? issues.noDate : issues.badDate).push(domain); }
     if (price === null) { why.push("нет цены продления"); issues.noPrice.push(domain); }
-    else if (price === 0) { why.push("цена продления 0 $"); issues.zeroPrice.push(domain); }
-    rec.review = why.join("; ");
+    else if (price <= 0) { why.push(price ? "отрицательная цена продления" : "цена продления 0 $"); issues.zeroPrice.push(domain); }
+    rec.review = [...new Set(why.flatMap(w => w.split("; ")))].join("; ");
 
     const prev = byDomain.get(domain);
     if (prev) {
@@ -381,7 +512,7 @@ function importRows(rows) {
       if (prev.owner !== rec.owner) diff.push(`сотрудник ${prev.owner || "нет"} / ${rec.owner || "нет"}`);
       if (prev.status !== rec.status) diff.push(`статус ${prev.status} / ${rec.status}`);
       if (diff.length) {
-        const msg = `в файле две строки с разными данными (${diff.join(", ")}), оставлена первая`;
+        const msg = `в файле две строки: ${diff.join(", ")}`;
         prev.review = [prev.review, msg].filter(Boolean).join("; ");
         prev.note = [prev.note, `Дубль при импорте, вторая строка ${line}: ${diff.join(", ")}`].filter(Boolean).join("\n");
         issues.conflict.push(`${domain}: ${diff.join(", ")}`);
@@ -399,8 +530,9 @@ function importRows(rows) {
     const s = [...ps].sort((a, b) => a - b), med = s[Math.floor(s.length / 2)];
     const same = ps.filter(p => p === med).length;
     if (r.price !== med && same / ps.length >= 0.6) {
-      const msg = `цена ${r.price} $, а у остальных ${tld(r.domain)} ${med} $`;
-      r.review = [r.review, msg].filter(Boolean).join("; "); issues.oddPrice.push(`${r.domain}: ${msg}`);
+      const msg = `цена ${r.price} $, у остальных ${tld(r.domain)} ${med} $`;
+      if (!r.review.includes(msg)) r.review = [r.review, msg].filter(Boolean).join("; ");
+      issues.oddPrice.push(`${r.domain}: ${msg}`);
     }
   });
   return {rows: out, report: {at: new Date().toISOString(), total, kept: out.length, fix, issues, dropped}};
@@ -408,79 +540,91 @@ function importRows(rows) {
 
 function readWorkbook(data, name) {
   const wb = XLSX.read(data, {type: typeof data === "string" ? "base64" : "array", cellDates: false, raw: /\.csv$/i.test(name || "")});
-  const ws = wb.Sheets[wb.SheetNames[0]];
-  return XLSX.utils.sheet_to_json(ws, {header: 1, raw: true, defval: null});
+  return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1, raw: true, defval: null});
 }
 
-function applyImport(rows, name) {
-  if (db.length && !confirm(`Заменить текущую базу (${db.length}) данными из файла «${name}»? Текущую базу можно сначала выгрузить.`)) return;
+function ask(title, text, ok) {
+  $("askTitle").textContent = title; $("askText").textContent = text; $("askOk").textContent = ok;
+  $("ask").returnValue = ""; $("ask").showModal();
+  return new Promise(r => $("ask").addEventListener("close", () => r($("ask").returnValue === "yes"), {once: true}));
+}
+async function applyImport(rows, name) {
+  if (db.length && !await ask("Заменить базу?", `Сейчас в базе ${db.length} ${plural(db.length, "домен", "домена", "доменов")}. Они заменятся данными из файла «${name}». Если нужна копия, сначала выгрузите базу`, "Заменить")) return;
   try {
     const res = importRows(rows);
     db = res.rows; lastReport = res.report; lastReport.file = name;
     save(); resetFilters(); render(); showReport();
-  } catch (e) { alert("Не получилось прочитать файл: " + e.message); }
+  } catch (e) { toast("Не получилось прочитать файл: " + e.message); }
 }
-
+function needXLSX() { if (typeof XLSX === "undefined") { toast("Не загрузилась библиотека для Excel, нужен интернет"); return false; } return true; }
 function importFile(f) {
-  if (typeof XLSX === "undefined") { alert("Не загрузилась библиотека для Excel: нужен интернет при первом открытии"); return; }
+  if (!needXLSX()) return;
   const rd = new FileReader();
-  rd.onload = () => { try { applyImport(readWorkbook(new Uint8Array(rd.result), f.name), f.name); } catch (e) { alert("Это не похоже на Excel или CSV: " + e.message); } };
+  rd.onload = () => { try { applyImport(readWorkbook(new Uint8Array(rd.result), f.name), f.name); } catch (e) { toast("Это не похоже на Excel или CSV"); } };
   rd.readAsArrayBuffer(f);
 }
 
-/* ---------- отчёт ---------- */
+/* ---------- отчёт об импорте ---------- */
 function showReport() {
   const r = lastReport; if (!r) return;
-  const li = (n, t, ex) => n ? `<li><span class="n">${n}</span><div><div class="t">${t}</div>${ex && ex.length ? `<div class="ex">${esc(ex.slice(0, 6).join(" · "))}${ex.length > 6 ? ` и ещё ${ex.length - 6}` : ""}</div>` : ""}</div></li>` : "";
+  const li = (n, t, ex) => n ? `<li><span class="n">${n}</span><div><div>${typeof t === "function" ? t(n) : t}</div>${ex && ex.length ? `<div class="ex">${esc(ex.slice(0, 6).join(" · "))}${ex.length > 6 ? ` и ещё ${ex.length - 6}` : ""}</div>` : ""}</div></li>` : "";
   const uniq = a => [...new Set(a)];
   const f = r.fix, x = r.issues;
   const fixed = [
-    li(f.status.length, "статусов приведены к пяти вариантам", uniq(f.status)),
-    li(f.price.length, "цен записаны текстом с $ или usd, переведены в числа", f.price),
-    li(f.date.length, "дат записаны текстом, переведены в даты", f.date),
-    li(f.domain.length, "доменов с www, заглавными буквами или пробелами", f.domain),
-    li(f.owner.length, "строк без сотрудника, помечены «не назначен»", f.owner),
-    li(r.dropped.length, "полных дублей удалены", r.dropped),
+    li(f.status.length, n => `${plural(n, "статус записан", "статуса записаны", "статусов записаны")} не по образцу, приведены к пяти вариантам`, uniq(f.status)),
+    li(f.price.length, n => `${plural(n, "цена записана", "цены записаны", "цен записаны")} текстом с $ или usd, переведены в числа`, f.price),
+    li(f.date.length, n => `${plural(n, "дата записана", "даты записаны", "дат записаны")} текстом, переведены в даты`, f.date),
+    li(f.domain.length, n => `${plural(n, "домен", "домена", "доменов")} с www, заглавными буквами или пробелом`, f.domain),
+    li(f.owner.length, n => `${plural(n, "строка", "строки", "строк")} без сотрудника, помечены «не назначен»`, f.owner),
+    li(r.dropped.length, n => `${plural(n, "полный дубль удалён", "полных дубля удалены", "полных дублей удалены")}`, r.dropped),
   ].join("");
+  const over = db.filter(d => isOver(d) && (d.status === "Активен" || d.status === "В работе"));
   const check = [
-    li(x.conflict.length, "доменов встречаются дважды с разными данными: оставлена первая строка, вторая записана в заметку", x.conflict),
-    li(x.noDate.length + x.badDate.length, "доменов без даты окончания: нужно посмотреть у регистратора", [...x.noDate, ...x.badDate]),
-    li(x.oddPrice.length, "цен выбиваются из цены своей зоны", x.oddPrice),
-    li(x.zeroPrice.length + x.noPrice.length, "доменов с ценой 0 $ или без цены", [...x.zeroPrice, ...x.noPrice]),
-    li(x.badDomain.length, "некорректных имён доменов", x.badDomain),
-    li(x.unknownStatus.length, "нераспознанных статусов", x.unknownStatus),
+    li(x.conflict.length, n => `${plural(n, "домен записан", "домена записаны", "доменов записаны")} дважды с разными данными. Оставлена первая строка, вторая сохранена в заметке`, x.conflict),
+    li(x.oddPrice.length, n => `${plural(n, "цена не совпадает", "цены не совпадают", "цен не совпадают")} с ценой своей доменной зоны, похоже на ошибку ввода`, x.oddPrice),
+    li(x.noDate.length + x.badDate.length, n => `${plural(n, "домен", "домена", "доменов")} без даты окончания, её нужно посмотреть у регистратора`, [...x.noDate, ...x.badDate]),
+    li(x.zeroPrice.length + x.noPrice.length, n => `${plural(n, "домен", "домена", "доменов")} без цены или с ценой 0 $ и меньше`, [...x.zeroPrice, ...x.noPrice]),
+    li(x.badDomain.length, n => plural(n, "некорректное имя домена", "некорректных имени доменов", "некорректных имён доменов"), x.badDomain),
+    li(x.unknownStatus.length, n => plural(n, "нераспознанный статус", "нераспознанных статуса", "нераспознанных статусов"), x.unknownStatus),
+    li(over.length, n => `${plural(n, "домен уже истёк", "домена уже истекли", "доменов уже истекли")}, но стоят как рабочие: продлить или сменить статус`, over.map(d => `${d.domain} (${fmtDate(d.expires)}, ${d.status})`)),
   ].join("");
-  const over = db.filter(d => daysLeft(d.expires) !== null && daysLeft(d.expires) < 0);
-  $("repBody").innerHTML = `<p style="margin:0 0 8px;color:var(--text-2)">Файл «${esc(r.file || "")}»: ${r.total} строк, в базе ${r.kept} доменов.</p>
-    <h3>Исправлено автоматически</h3><ul class="rep-list">${fixed || "<li>ничего</li>"}</ul>
-    <h3>Нужна проверка человеком</h3><p style="margin:0;color:var(--muted);font-size:12px">Эти домены отмечены значком и находятся фильтром «Требуют проверки». Отметка снимается, когда домен сохранён через «Изменить».</p><ul class="rep-list">${check || "<li>ничего</li>"}${li(over.length, "доменов уже истекли, но в базе стоят как рабочие: продлить или сменить статус", over.map(d => `${d.domain} (${fmtDate(d.expires)}, ${d.status})`))}</ul>`;
+  $("repBody").innerHTML = `<p class="rep-lead">Файл «${esc(r.file || "")}»: ${r.total} строк, в базе ${r.kept} ${plural(r.kept, "домен", "домена", "доменов")}</p>
+    <h3>Исправлено автоматически</h3><ul>${fixed || "<li><span></span><div>Ничего</div></li>"}</ul>
+    <h3>Требуют проверки</h3><p class="note">Их находит фильтр «Требуют проверки», причина видна под именем домена. Отметка снимается, когда домен сохранён через «Изменить»</p><ul>${check || "<li><span></span><div>Ничего</div></li>"}</ul>`;
   $("report").showModal();
 }
 
 /* ---------- отрисовка ---------- */
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
 const money = n => n === null || n === undefined ? "" : (Math.round(n * 100) / 100).toLocaleString("ru-RU", {maximumFractionDigits: 2});
-const flags = d => [d.review, !d.expires && !d.review.includes("дат") ? "нет даты окончания" : ""].filter(Boolean).join("; ");
+const flags = d => [d.review, !d.expires && !/дат/.test(d.review) ? "нет даты окончания" : ""].filter(Boolean).join("; ");
+const sum = list => list.reduce((s, d) => s + (d.price || 0), 0);
+const isOver = d => { const n = daysLeft(d.expires); return n !== null && n < 0; };
+const isSoon = d => { const n = daysLeft(d.expires); return n !== null && n >= 0 && n <= SOON_DAYS; };
+const ICON = {
+  renew: '<svg class="i" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.2L3 16M3 21v-5h5"/></svg>',
+  edit: '<svg class="i" viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>',
+  del: '<svg class="i" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>',
+};
 
-function fillSelect(el, label, items, keep) {
-  const v = keep ?? el.value;
-  el.innerHTML = `<option value="">${label}</option>` + items.map(x => `<option value="${esc(x)}">${esc(x || "не назначен")}</option>`).join("");
-  el.value = items.includes(v) ? v : "";
+function fillSelect(el, label, vals, text = v => v) {
+  const v = el.value;
+  el.innerHTML = `<option value="">${label}</option>` + vals.map(x => `<option value="${esc(x)}">${esc(text(x))}</option>`).join("");
+  el.value = vals.includes(v) ? v : "";
 }
 
 function filtered() {
   const q = $("q").value.trim().toLowerCase(), st = $("fStatus").value, ow = $("fOwner").value, rg = $("fReg").value;
-  const soon = $("fSoon").checked, fl = $("fFlag").checked;
   return db.filter(d => {
     if (q && !`${d.domain} ${d.owner} ${d.registrar} ${d.note}`.toLowerCase().includes(q)) return false;
     if (st && d.status !== st) return false;
     if (ow && d.owner !== (ow === NONE ? "" : ow)) return false;
     if (rg && d.registrar !== rg) return false;
-    const n = daysLeft(d.expires);
-    if (soon && !(n !== null && n <= SOON_DAYS)) return false;
-    if (fl && !flags(d)) return false;
-    if (monthFilter === "over" && !(n !== null && n < 0)) return false;
-    if (monthFilter && monthFilter !== "over" && !(d.expires.startsWith(monthFilter) && n >= 0)) return false;
+    if ($("fSoon").checked && !(isOver(d) || isSoon(d))) return false;
+    if ($("fFlag").checked && !flags(d)) return false;
+    if (monthFilter === "over" && !isOver(d)) return false;
+    if (monthFilter === "soon" && !isSoon(d)) return false;
+    if (monthFilter && monthFilter !== "over" && monthFilter !== "soon" && !(d.expires.startsWith(monthFilter) && !isOver(d))) return false;
     return true;
   });
 }
@@ -488,154 +632,164 @@ function filtered() {
 function sorted(list) {
   const k = sort.key, dir = sort.dir;
   return [...list].sort((a, b) => {
-    let x = a[k], y = b[k];
-    if (x === "" || x === null) return 1; if (y === "" || y === null) return -1;
+    const x = a[k], y = b[k];
+    const ex = x === "" || x === null, ey = y === "" || y === null;
+    if (ex || ey) return ex - ey;
     return (typeof x === "number" ? x - y : String(x).localeCompare(String(y), "ru")) * dir;
   });
 }
 
-const COLS = [["domain", "Домен"], ["registrar", "Регистратор"], ["expires", "Дата окончания"], ["price", "Продление, $", "r"], ["owner", "Сотрудник"], ["status", "Статус"]];
+const COLS = [["domain", "Домен"], ["registrar", "Регистратор"], ["expires", "Окончание"], ["price", "Продление, $", "r"], ["owner", "Сотрудник"], ["status", "Статус"]];
 
 function render() {
-  $("today").textContent = "сегодня " + fmtDate(todayISO());
   const has = db.length > 0;
-  $("main").hidden = !has; $("empty").hidden = has; $("btnExport").hidden = !has;
-  $("btnReport").hidden = !lastReport || !has;
+  $("main").hidden = !has; $("empty").hidden = has;
+  $("exportWrap").hidden = $("btnAdd").hidden = $("btnImport").hidden = !has; $("btnReport").hidden = !lastReport || !has;
+  const t = new Date();
+  $("meta").textContent = (has ? `${db.length} ${plural(db.length, "домен", "домена", "доменов")} · ` : "") + `сегодня ${t.getDate()} ${MONTHS_GEN[t.getMonth()]}`;
+  save();
   if (!has) return;
 
-  const owners = [...new Set(db.map(d => d.owner))].sort((a, b) => (a === "") - (b === "") || a.localeCompare(b, "ru"));
+  const owners = [...new Set(db.map(d => d.owner || NONE))].sort((a, b) => (a === NONE) - (b === NONE) || a.localeCompare(b, "ru"));
   const regs = [...new Set(db.map(d => d.registrar).filter(Boolean))].sort();
   fillSelect($("fStatus"), "Все статусы", STATUSES);
-  fillOwner(owners);
+  fillSelect($("fOwner"), "Все сотрудники", owners, o => o === NONE ? "Не назначен" : o);
   fillSelect($("fReg"), "Все регистраторы", regs);
   $("regList").innerHTML = regs.map(r => `<option value="${esc(r)}">`).join("");
-  $("ownerList").innerHTML = owners.filter(Boolean).map(r => `<option value="${esc(r)}">`).join("");
+  $("ownerList").innerHTML = owners.filter(o => o !== NONE).map(r => `<option value="${esc(r)}">`).join("");
 
-  renderSummary(); renderChart();
-
-  const list = sorted(filtered());
-  $("thead").innerHTML = COLS.map(([k, t, c]) => `<th class="${c || ""}" data-k="${k}">${t}${sort.key === k ? `<span class="arr">${sort.dir > 0 ? "↑" : "↓"}</span>` : ""}</th>`).join("") + "<th></th>";
-  $("tbody").innerHTML = list.length ? list.map(d => {
-    const n = daysLeft(d.expires), cls = n === null ? "" : n < 0 ? "over" : n <= SOON_DAYS ? "soon" : "";
-    const fl = flags(d);
-    return `<tr class="${cls}" data-id="${d.id}">
-      <td><span class="dom">${esc(d.domain)}</span>${fl ? `<span class="flag" title="${esc(fl)}" aria-label="Проверить: ${esc(fl)}"><svg class="i" viewBox="0 0 24 24"><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/></svg></span>` : ""}</td>
-      <td>${esc(d.registrar) || '<span class="none">не указан</span>'}</td>
-      <td class="num">${d.expires ? fmtDate(d.expires) + `<span class="days">${daysText(n)}</span>` : '<span class="none">нет даты</span>'}</td>
-      <td class="r num">${d.price === null ? '<span class="none">нет</span>' : money(d.price)}</td>
-      <td>${esc(d.owner) || '<span class="none">не назначен</span>'}</td>
-      <td><span class="dot" style="background:${ST_COLOR[d.status]}"></span><select class="status" aria-label="Статус ${esc(d.domain)}">${STATUSES.map(s => `<option${s === d.status ? " selected" : ""}>${s}</option>`).join("")}</select></td>
-      <td><div class="acts"><button class="btn ghost icon" data-act="edit" title="Изменить" aria-label="Изменить ${esc(d.domain)}"><svg class="i" viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></button><button class="btn ghost icon" data-act="del" title="Удалить" aria-label="Удалить ${esc(d.domain)}"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></td>
-    </tr>`;
-  }).join("") : `<tr><td colspan="7" class="none" style="text-align:center;height:88px">Ничего не найдено по этим фильтрам</td></tr>`;
-
-  const sum = list.reduce((s, d) => s + (d.price || 0), 0);
-  $("count").innerHTML = `<span class="num">${list.length}</span> из <span class="num">${db.length}</span> · продление <span class="num">${money(sum)} $</span>`;
-  const any = $("q").value || $("fStatus").value || $("fOwner").value || $("fReg").value || $("fSoon").checked || $("fFlag").checked || monthFilter;
-  $("btnReset").hidden = !any;
-  $("cSoon").classList.toggle("on", $("fSoon").checked); $("cFlag").classList.toggle("on", $("fFlag").checked);
-  save();
+  renderOverview(); renderChart(); renderTable(); renderFoot();
 }
 
-function fillOwner(owners) {
-  const el = $("fOwner"), v = el.value, vals = owners.map(o => o || NONE);
-  el.innerHTML = `<option value="">Все сотрудники</option>` + vals.map(o => `<option value="${esc(o)}">${o === NONE ? "не назначен" : esc(o)}</option>`).join("");
-  el.value = vals.includes(v) ? v : "";
-}
-
-function renderSummary() {
-  const total = db.reduce((s, d) => s + (d.price || 0), 0);
-  const active = db.filter(d => d.status !== "Забанен").reduce((s, d) => s + (d.price || 0), 0);
-  const over = db.filter(d => { const n = daysLeft(d.expires); return n !== null && n < 0; });
-  const soon = db.filter(d => { const n = daysLeft(d.expires); return n !== null && n >= 0 && n <= SOON_DAYS; });
-  const toCheck = db.filter(d => flags(d)).length;
+function renderOverview() {
+  const total = sum(db), live = sum(db.filter(d => d.status !== "Забанен"));
+  $("figTotal").innerHTML = `${money(total)}<small>$</small>`;
+  $("figSub").textContent = `без забаненных доменов ${money(live)} $`;
+  const over = db.filter(isOver), soon = db.filter(isSoon), bad = db.filter(d => flags(d));
+  const row = (key, on, color, label, n, extra) => `<button class="row-btn${on ? " on" : ""}" data-go="${key}"><span class="dot" style="background:${color}"></span><span>${label}</span><span class="n">${n}${extra ? `<span class="x">· ${extra}</span>` : ""}</span></button>`;
+  $("attention").innerHTML =
+    row("over", monthFilter === "over", "var(--danger)", "Уже истекли", over.length) +
+    row("soon", monthFilter === "soon", "var(--warn)", `Истекают за ${SOON_DAYS} дней`, soon.length, soon.length ? `${money(sum(soon))} $` : "") +
+    row("flag", $("fFlag").checked, "var(--muted)", "Требуют проверки", bad.length);
   const cnt = Object.fromEntries(STATUSES.map(s => [s, db.filter(d => d.status === s).length]));
   const max = Math.max(...Object.values(cnt), 1);
-  $("summary").innerHTML = `
-    <div class="card"><div class="label">Продление всей базы за год</div><div class="fig">${money(total)} $</div><div class="sub">без забаненных ${money(active)} $</div></div>
-    <div class="card danger click" data-go="over"><div class="label">Уже истекли</div><div class="fig">${over.length}</div><div class="sub">${over.length ? "продлить или убрать из базы" : "нет"}</div></div>
-    <div class="card warn click" data-go="soon"><div class="label">Истекают за ${SOON_DAYS} дней</div><div class="fig">${soon.length}</div><div class="sub">${money(soon.reduce((s, d) => s + (d.price || 0), 0))} $ на продление</div></div>
-    <div class="card click" data-go="flag"><div class="label">Требуют проверки</div><div class="fig">${toCheck}</div><div class="sub">ошибки и вопросы в данных</div></div>
-    <div class="card wide"><div class="statuses">${STATUSES.map(s => `<button class="st-row${$("fStatus").value === s ? " on" : ""}" data-st="${s}"><span><span class="dot" style="background:${ST_COLOR[s]}"></span> ${s}</span><span class="bar"><i style="width:${cnt[s] / max * 100}%"></i></span><span class="n">${cnt[s]}</span></button>`).join("")}</div></div>`;
+  $("statuses").innerHTML = STATUSES.map(s => `<button class="row-btn st${$("fStatus").value === s ? " on" : ""}" data-st="${s}"><span class="dot" style="background:${ST_COLOR[s]}"></span><span>${s}</span><span class="track"><i style="width:${cnt[s] / max * 100}%"></i></span><span class="n">${cnt[s]}</span></button>`).join("");
 }
 
 function renderChart() {
   const t = new Date(), cols = [{key: "over", top: "истекли", sum: 0, n: 0, cls: "over"}];
   for (let i = 0; i < 12; i++) {
     const d = new Date(t.getFullYear(), t.getMonth() + i, 1);
-    cols.push({key: `${d.getFullYear()}-${pad(d.getMonth() + 1)}`, top: MONTHS[d.getMonth()], year: d.getMonth() === 0 || i === 0 ? d.getFullYear() : "", sum: 0, n: 0, soon: 0});
+    cols.push({key: `${d.getFullYear()}-${pad(d.getMonth() + 1)}`, top: MONTHS[d.getMonth()], year: i === 0 || d.getMonth() === 0 ? d.getFullYear() : "", sum: 0, n: 0, soon: 0});
   }
-  let later = 0;
   db.forEach(d => {
     const n = daysLeft(d.expires); if (n === null) return;
-    const c = n < 0 ? cols[0] : cols.find(c => c.key === d.expires.slice(0, 7));
-    if (!c) { later++; return; }
+    const c = n < 0 ? cols[0] : cols.find(c => c.key === d.expires.slice(0, 7)); if (!c) return;
     c.sum += d.price || 0; c.n++; if (n >= 0 && n <= SOON_DAYS) c.soon++;
   });
-  const max = Math.max(...cols.map(c => c.sum), 1);
-  $("bars").innerHTML = cols.map(c => `<button class="bar-col ${c.cls || (c.soon ? "soon" : "")}${monthFilter === c.key ? " on" : ""}" data-m="${c.key}" title="${c.n} ${plural(c.n, "домен", "домена", "доменов")}, ${money(c.sum)} $"><span class="v">${c.sum ? money(c.sum) : ""}</span><span class="b" style="height:${Math.max(c.sum / max * 110, c.n ? 3 : 0)}px"></span></button>`).join("");
-  $("months").innerHTML = cols.map(c => `<div><b>${c.top}</b>${c.year || (c.key === "over" ? "" : "")}&nbsp;</div>`).join("");
+  const max = Math.max(...cols.map(c => c.sum), 1), H = Math.max($("bars").clientHeight - 24, 100);
+  $("bars").innerHTML = cols.map(c => `<button class="bar-col ${c.cls || (c.soon ? "soon" : "")}${monthFilter === c.key ? " on" : ""}" data-m="${c.key}" aria-label="${c.top} ${c.year || ""}: ${c.n} ${plural(c.n, "домен", "домена", "доменов")}, ${money(c.sum)} $" title="${c.n} ${plural(c.n, "домен", "домена", "доменов")}, ${money(c.sum)} $"><span class="v">${c.sum ? money(c.sum) : ""}</span><span class="b" style="height:${c.n ? Math.max(c.sum / max * H, 3) : 0}px"></span></button>`).join("");
+  $("months").innerHTML = cols.map(c => `<div>${c.top}<span>${c.year || "&nbsp;"}</span></div>`).join("");
+}
+
+function renderTable() {
+  const list = sorted(filtered());
+  $("thead").innerHTML = COLS.map(([k, t, c]) => `<th class="${c || ""}${sort.key === k ? " on" : ""}" aria-sort="${sort.key === k ? (sort.dir > 0 ? "ascending" : "descending") : "none"}"><button data-k="${k}">${t}${sort.key === k ? `<span aria-hidden="true">${sort.dir > 0 ? "↑" : "↓"}</span>` : ""}</button></th>`).join("") + '<th><span hidden>Действия</span></th>';
+  $("tbody").innerHTML = list.length ? list.map(d => {
+    const n = daysLeft(d.expires), cls = n === null ? "" : n < 0 ? "over" : n <= SOON_DAYS ? "soon" : "", fl = flags(d);
+    return `<tr class="${cls}" data-id="${d.id}">
+      <td><span class="l1">${esc(d.domain)}</span>${fl ? `<span class="l2 warn" title="${esc(fl)}">${esc(fl)}</span>` : ""}</td>
+      <td>${esc(d.registrar) || '<span class="none">Не указан</span>'}</td>
+      <td class="num">${d.expires ? `<span class="l1">${fmtDate(d.expires)}</span><span class="l2 days">${daysText(n)}</span>` : '<span class="none">Нет даты</span>'}</td>
+      <td class="r num">${d.price === null ? '<span class="none">—</span>' : money(d.price)}</td>
+      <td>${esc(d.owner) || '<span class="none">Не назначен</span>'}</td>
+      <td><span class="status-wrap"><span class="dot" style="background:${ST_COLOR[d.status]}"></span><select class="status" aria-label="Статус ${esc(d.domain)}">${STATUSES.map(s => `<option${s === d.status ? " selected" : ""}>${s}</option>`).join("")}</select></span></td>
+      <td><div class="acts">
+        <button class="btn icon" data-act="renew" title="Продлён на год" aria-label="Отметить ${esc(d.domain)} продлённым на год">${ICON.renew}</button>
+        <button class="btn icon" data-act="edit" title="Изменить" aria-label="Изменить ${esc(d.domain)}">${ICON.edit}</button>
+        <button class="btn icon" data-act="del" title="Удалить" aria-label="Удалить ${esc(d.domain)}">${ICON.del}</button>
+      </div></td>
+    </tr>`;
+  }).join("") : `<tr class="empty-row"><td colspan="7">По этим фильтрам доменов нет</td></tr>`;
+
+  $("count").innerHTML = list.length === db.length
+    ? `<b>${db.length}</b> ${plural(db.length, "домен", "домена", "доменов")}`
+    : `<b>${list.length}</b> из ${db.length} · продление <b>${money(sum(list))} $</b> в год`;
+  $("btnReset").hidden = !($("q").value || $("fStatus").value || $("fOwner").value || $("fReg").value || $("fSoon").checked || $("fFlag").checked || monthFilter);
+}
+
+function renderFoot() {
+  $("saved").textContent = storageOk ? "Изменения сохраняются в этом браузере" : "Браузер не даёт сохранять данные, выгрузите базу перед закрытием";
+  const days = lastExport ? Math.round((utc(todayISO()) - utc(lastExport)) / 864e5) : null;
+  $("backup").className = days === null || days > 7 ? "warn" : "";
+  $("backup").innerHTML = days === null ? 'Резервной копии ещё нет. <button class="link" data-x="xlsx">Выгрузить в Excel</button>'
+    : `Последняя выгрузка ${days === 0 ? "сегодня" : daysText(-days).replace("истёк ", "")}${days > 7 ? '. <button class="link" data-x="xlsx">Выгрузить снова</button>' : ""}`;
 }
 
 /* ---------- редактирование ---------- */
 let editing = null;
 function openEdit(d) {
   editing = d || null;
-  $("editTitle").textContent = d ? "Изменить домен" : "Новый домен";
+  $("editTitle").textContent = d ? d.domain : "Новый домен";
   $("eStatus").innerHTML = STATUSES.map(s => `<option>${s}</option>`).join("");
   $("eDomain").value = d?.domain || ""; $("eReg").value = d?.registrar || ""; $("eDate").value = d?.expires || "";
   $("ePrice").value = d?.price ?? ""; $("eOwner").value = d?.owner || ""; $("eStatus").value = d?.status || "Активен";
   $("eNote").value = d ? [d.note, d.review ? `Проверить: ${d.review}` : ""].filter(Boolean).join("\n") : "";
   $("eDomainErr").textContent = $("ePriceErr").textContent = "";
-  $("edit").showModal(); $("eDomain").focus();
+  const q = encodeURIComponent(d?.domain || "");
+  $("eChecks").innerHTML = d ? `Проверить домен: <a href="https://www.whois.com/whois/${q}" target="_blank" rel="noopener">Whois</a><a href="https://web.archive.org/web/*/${q}" target="_blank" rel="noopener">Web Archive</a><a href="https://check.spamhaus.org/results/?query=${q}" target="_blank" rel="noopener">Spamhaus</a><a href="https://www.virustotal.com/gui/domain/${q}" target="_blank" rel="noopener">VirusTotal</a>` : "";
+  $("edit").showModal(); (d ? $("eDate") : $("eDomain")).focus();
 }
 $("editForm").addEventListener("submit", e => {
   if (e.submitter?.value !== "save") return;
   const domain = normDomain($("eDomain").value);
-  let ok = true;
   $("eDomainErr").textContent = !DOMAIN_RE.test(domain) ? "Нужен домен вида example.com" : db.some(d => d.domain === domain && d !== editing) ? "Такой домен уже есть в базе" : "";
   const p = $("ePrice").value === "" ? null : +$("ePrice").value;
   $("ePriceErr").textContent = p !== null && (isNaN(p) || p < 0) ? "Цена не может быть отрицательной" : "";
   if ($("eDomainErr").textContent || $("ePriceErr").textContent) { e.preventDefault(); return; }
   const rec = {domain, registrar: normRegistrar($("eReg").value), expires: $("eDate").value, price: p, owner: normOwner($("eOwner").value), status: $("eStatus").value,
     note: $("eNote").value.split("\n").filter(l => !l.startsWith("Проверить: ")).join("\n").trim(), review: ""};
-  if (editing) Object.assign(editing, rec); else db.unshift({id: uid(), ...rec});
-  render(); toast(editing ? "Изменения сохранены" : `Домен ${domain} добавлен`);
+  if (editing) { const t = editing, before = {...t}; Object.assign(t, rec); render(); toast("Изменения сохранены", () => Object.assign(t, before)); }
+  else { db.unshift({id: uid(), ...rec}); render(); toast(`${domain} добавлен`); }
 });
 
-/* ---------- удаление с отменой ---------- */
-let undoItem = null, toastTimer;
+/* ---------- уведомления с отменой ---------- */
+let undoFn = null, toastTimer;
 function toast(text, undo) {
+  undoFn = undo || null;
   $("toastText").textContent = text; $("toastUndo").hidden = !undo;
   $("toast").classList.add("show"); clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => $("toast").classList.remove("show"), undo ? 6000 : 2500);
+  toastTimer = setTimeout(() => { $("toast").classList.remove("show"); undoFn = null; }, undo ? 6000 : 2500);
 }
-$("toastUndo").onclick = () => { if (undoItem) { db.splice(Math.min(undoItem.i, db.length), 0, undoItem.d); undoItem = null; render(); toast("Домен возвращён"); } };
+$("toastUndo").onclick = () => { if (undoFn) { undoFn(); undoFn = null; render(); toast("Отменено"); } };
 
 /* ---------- выгрузка ---------- */
-function serial(iso) { return (utc(iso) - Date.UTC(1899, 11, 30)) / 864e5; }
+const serial = iso => (utc(iso) - Date.UTC(1899, 11, 30)) / 864e5;
 const HEAD = ["Домен", "Регистратор", "Дата окончания", "Продление, $", "Сотрудник", "Статус", "Заметка"];
+const noteOut = (d, sep) => [d.note, d.review && "Проверить: " + d.review].filter(Boolean).join(sep);
+function exported() { lastExport = todayISO(); save(); renderFoot(); }
 function exportXLSX() {
-  const list = sorted(db);
-  const ws = XLSX.utils.aoa_to_sheet([HEAD]);
+  if (!needXLSX()) return;
+  const list = sorted(db), ws = XLSX.utils.aoa_to_sheet([HEAD]);
   list.forEach((d, i) => {
     const r = i + 1, set = (c, cell) => ws[XLSX.utils.encode_cell({r, c})] = cell;
     set(0, {t: "s", v: d.domain}); set(1, {t: "s", v: d.registrar});
     if (d.expires) set(2, {t: "n", v: serial(d.expires), z: "dd.mm.yyyy"});
-    if (d.price !== null) set(3, {t: "n", v: d.price}); set(4, {t: "s", v: d.owner}); set(5, {t: "s", v: d.status}); set(6, {t: "s", v: [d.note, d.review && "Проверить: " + d.review].filter(Boolean).join("\n")});
+    if (d.price !== null) set(3, {t: "n", v: d.price});
+    set(4, {t: "s", v: d.owner}); set(5, {t: "s", v: d.status}); set(6, {t: "s", v: noteOut(d, "\n")});
   });
   ws["!ref"] = XLSX.utils.encode_range({s: {r: 0, c: 0}, e: {r: list.length, c: HEAD.length - 1}});
   ws["!cols"] = [{wch: 24}, {wch: 12}, {wch: 14}, {wch: 12}, {wch: 12}, {wch: 10}, {wch: 50}];
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Домены");
-  XLSX.writeFile(wb, `domains-${todayISO()}.xlsx`);
+  XLSX.writeFile(wb, `domains-${todayISO()}.xlsx`); exported();
 }
 function exportCSV() {
   const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  const csv = [HEAD, ...sorted(db).map(d => [d.domain, d.registrar, fmtDate(d.expires), d.price === null ? "" : String(d.price).replace(".", ","), d.owner, d.status, [d.note, d.review && "Проверить: " + d.review].filter(Boolean).join(" | ")])]
+  const csv = [HEAD, ...sorted(db).map(d => [d.domain, d.registrar, fmtDate(d.expires), d.price === null ? "" : String(d.price).replace(".", ","), d.owner, d.status, noteOut(d, " | ")])]
     .map(r => r.map(q).join(";")).join("\r\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob(["﻿" + csv], {type: "text/csv;charset=utf-8"}));
-  a.download = `domains-${todayISO()}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  a.download = `domains-${todayISO()}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); exported();
 }
 
 /* ---------- события ---------- */
@@ -644,44 +798,54 @@ function resetFilters() { $("q").value = ""; ["fStatus", "fOwner", "fReg"].forEa
 $("btnReset").onclick = () => { resetFilters(); render(); };
 $("btnImport").onclick = $("btnImport2").onclick = () => $("file").click();
 $("file").onchange = e => { if (e.target.files[0]) importFile(e.target.files[0]); e.target.value = ""; };
-$("btnSample").onclick = () => { if (typeof XLSX === "undefined") return alert("Не загрузилась библиотека для Excel: нужен интернет"); applyImport(readWorkbook(SAMPLE_B64, "Список_доменов.xlsx"), "Список_доменов.xlsx"); };
+$("btnSample").onclick = () => { if (needXLSX()) applyImport(readWorkbook(SAMPLE_B64, "Список_доменов.xlsx"), "Список_доменов.xlsx"); };
 $("btnReport").onclick = showReport;
 $("btnAdd").onclick = () => openEdit();
-$("btnExport").onclick = e => {
-  const m = document.createElement("div");
-  m.className = "card"; m.style.cssText = "position:absolute;padding:6px;display:flex;flex-direction:column;gap:2px;z-index:5;box-shadow:0 8px 24px rgba(0,0,0,.12)";
-  m.innerHTML = `<button class="btn ghost" data-x="xlsx">Excel (.xlsx)</button><button class="btn ghost" data-x="csv">CSV для Excel</button>`;
-  const r = e.currentTarget.getBoundingClientRect(); m.style.top = r.bottom + scrollY + 4 + "px"; m.style.left = Math.min(r.left, innerWidth - 180) + "px";
-  document.body.appendChild(m);
-  const close = ev => { if (!m.contains(ev.target) || ev.target.dataset.x) { if (ev.target.dataset.x === "xlsx") exportXLSX(); if (ev.target.dataset.x === "csv") exportCSV(); m.remove(); document.removeEventListener("click", close, true); } };
-  setTimeout(() => document.addEventListener("click", close, true));
-};
-$("btnWipe").onclick = () => { if (confirm(`Удалить все ${db.length} доменов из этого браузера? Сначала можно выгрузить базу в Excel.`)) { db = []; lastReport = null; save(); render(); } };
-$("thead").onclick = e => { const k = e.target.closest("th")?.dataset.k; if (!k) return; sort = {key: k, dir: sort.key === k ? -sort.dir : 1}; render(); };
+$("btnWipe").onclick = () => { const old = {db, lastReport}; db = []; lastReport = null; render(); toast("База очищена", () => ({db, lastReport} = old)); };
+
+function menu(open) { $("exportMenu").classList.toggle("open", open); $("btnExport").setAttribute("aria-expanded", open); if (open) $("exportMenu").querySelector("button").focus(); }
+$("btnExport").onclick = () => menu(!$("exportMenu").classList.contains("open"));
+document.addEventListener("click", e => {
+  const x = e.target.closest("[data-x]")?.dataset.x;
+  if (x === "xlsx") exportXLSX(); if (x === "csv") exportCSV();
+  if (x || !$("exportWrap").contains(e.target)) menu(false);
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") menu(false);
+  if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) && !document.querySelector("dialog[open]") && db.length) { e.preventDefault(); $("q").focus(); }
+});
+
+$("thead").onclick = e => { const k = e.target.closest("[data-k]")?.dataset.k; if (!k) return; sort = {key: k, dir: sort.key === k ? -sort.dir : 1}; render(); };
 $("tbody").addEventListener("change", e => {
   if (!e.target.classList.contains("status")) return;
-  const d = db.find(x => x.id === e.target.closest("tr").dataset.id); const was = d.status; d.status = e.target.value;
-  render(); toast(`${d.domain}: ${was} → ${d.status}`);
+  const d = db.find(x => x.id === e.target.closest("tr").dataset.id), was = d.status; d.status = e.target.value;
+  render(); toast(`${d.domain}: ${was} → ${d.status}`, () => d.status = was);
 });
 $("tbody").addEventListener("click", e => {
   const b = e.target.closest("[data-act]"); if (!b) return;
   const i = db.findIndex(x => x.id === b.closest("tr").dataset.id), d = db[i];
   if (b.dataset.act === "edit") openEdit(d);
-  if (b.dataset.act === "del") { undoItem = {d, i}; db.splice(i, 1); render(); toast(`${d.domain} удалён`, true); }
+  if (b.dataset.act === "del") { db.splice(i, 1); render(); toast(`${d.domain} удалён`, () => db.splice(Math.min(i, db.length), 0, d)); }
+  if (b.dataset.act === "renew") {
+    if (!d.expires) return openEdit(d);
+    const was = d.expires; d.expires = addYear(d.expires); render();
+    toast(`${d.domain} продлён до ${fmtDate(d.expires)}`, () => d.expires = was);
+  }
 });
-$("summary").addEventListener("click", e => {
-  const st = e.target.closest("[data-st]")?.dataset.st, go = e.target.closest("[data-go]")?.dataset.go;
+document.querySelector(".overview").addEventListener("click", e => {
+  const st = e.target.closest("[data-st]")?.dataset.st, go = e.target.closest("[data-go]")?.dataset.go, m = e.target.closest("[data-m]")?.dataset.m;
   if (st) $("fStatus").value = $("fStatus").value === st ? "" : st;
-  if (go === "soon") { $("fSoon").checked = !$("fSoon").checked; monthFilter = null; }
+  if (go === "soon") monthFilter = monthFilter === "soon" ? null : "soon";
   if (go === "flag") $("fFlag").checked = !$("fFlag").checked;
   if (go === "over") monthFilter = monthFilter === "over" ? null : "over";
-  if (st || go) { render(); $("q").scrollIntoView({behavior: "smooth", block: "center"}); }
+  if (m) monthFilter = monthFilter === m ? null : m;
+  if (st || go || m) render();
 });
-$("bars").addEventListener("click", e => { const m = e.target.closest("[data-m]")?.dataset.m; if (!m) return; monthFilter = monthFilter === m ? null : m; render(); });
-document.addEventListener("dragover", e => { e.preventDefault(); document.body.classList.add("drop"); });
-document.addEventListener("dragleave", e => { if (!e.relatedTarget) document.body.classList.remove("drop"); });
-document.addEventListener("drop", e => { e.preventDefault(); document.body.classList.remove("drop"); const f = e.dataTransfer.files[0]; if (f) importFile(f); });
+document.addEventListener("dragover", e => { e.preventDefault(); document.body.classList.add("dragging"); });
+document.addEventListener("dragleave", e => { if (!e.relatedTarget) document.body.classList.remove("dragging"); });
+document.addEventListener("drop", e => { e.preventDefault(); document.body.classList.remove("dragging"); const f = e.dataTransfer.files[0]; if (f) importFile(f); });
 
+addEventListener("resize", () => { if (db.length) renderChart(); });
 load(); render();
 </script>
 </body>
